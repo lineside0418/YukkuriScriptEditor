@@ -2,16 +2,25 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Yukkuri Script Editor</title>
     <link rel="icon" href="./Logo.png" />
     
+    <!-- PWA & Mobile Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#F5F5F7">
+    <link rel="manifest" id="manifest-placeholder">
+
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     
     <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- SortableJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     
     <!-- Tailwind CSS with Dark Mode Config -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -71,6 +80,121 @@
             background-color: #000000;
             color: #F5F5F7;
         }
+        
+        /* Reader Mode Styles (Light Mode) - Sepia */
+        html:not(.dark).reader body {
+            background-color: #F4ECD8 !important; /* Sepia background */
+            color: #5b4636 !important; /* Dark brown text */
+        }
+        html:not(.dark).reader .glass {
+            background: rgba(244, 236, 216, 0.95) !important;
+            border-bottom: 1px solid rgba(91, 70, 54, 0.1) !important;
+        }
+        html:not(.dark).reader .glass-panel, 
+        html:not(.dark).reader .bg-white {
+            background-color: #FBF6E9 !important;
+            border-color: rgba(91, 70, 54, 0.1) !important;
+            color: #5b4636 !important;
+        }
+        html:not(.dark).reader aside {
+            background-color: #FBF6E9 !important;
+            border-right: 1px solid rgba(91, 70, 54, 0.1) !important;
+        }
+        html:not(.dark).reader .input-apple {
+            background-color: #FDFAF4 !important;
+            border: 1px solid #DCCFB8 !important;
+            color: #433422 !important;
+            box-shadow: none !important;
+        }
+        html:not(.dark).reader .input-apple:focus {
+            border-color: #8B6B4E !important;
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(139, 107, 78, 0.3) !important;
+            background-color: #FFFFFF !important;
+        }
+        html:not(.dark).reader .text-gray-800, 
+        html:not(.dark).reader .text-gray-700 { 
+            color: #433422 !important; 
+        }
+        html:not(.dark).reader .text-gray-500,
+        html:not(.dark).reader .text-gray-400 { 
+            color: #8B6B4E !important; 
+        }
+        html:not(.dark).reader .bg-gray-50 { 
+            background-color: #F0E6D2 !important; 
+        }
+        html:not(.dark).reader .border-gray-100,
+        html:not(.dark).reader .border-gray-200 {
+            border-color: rgba(91, 70, 54, 0.15) !important;
+        }
+        html:not(.dark).reader ::-webkit-scrollbar-thumb {
+            background: #DCCFB8;
+        }
+        html:not(.dark).reader .drag-target-top {
+            border-top: 2px solid #8B6B4E !important;
+        }
+
+        /* Reader Mode Styles (Dark Mode) - Low Contrast */
+        html.dark.reader body {
+            background-color: #1c1c1e !important; /* Slightly lighter than pure black */
+            color: #a1a1aa !important; /* Low contrast gray text */
+        }
+        html.dark.reader .glass {
+            background: rgba(28, 28, 30, 0.95) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        }
+        html.dark.reader .glass-panel, 
+        html.dark.reader .bg-white,
+        html.dark.reader .dark\:bg-system-gray5 {
+            background-color: #262626 !important; /* Dark Gray */
+            border-color: rgba(255, 255, 255, 0.05) !important;
+            color: #a1a1aa !important;
+        }
+        html.dark.reader aside {
+            background-color: #262626 !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+        }
+        html.dark.reader .input-apple {
+            background-color: #2c2c2e !important;
+            border: 1px solid #3f3f46 !important;
+            color: #d4d4d8 !important;
+            box-shadow: none !important;
+        }
+        html.dark.reader .input-apple:focus {
+            border-color: #52525b !important;
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(82, 82, 91, 0.5) !important;
+            background-color: #3f3f46 !important;
+        }
+        html.dark.reader .text-gray-800, 
+        html.dark.reader .dark\:text-gray-100,
+        html.dark.reader .text-gray-700,
+        html.dark.reader .dark\:text-gray-200 { 
+            color: #d4d4d8 !important; 
+        }
+        html.dark.reader .text-gray-500,
+        html.dark.reader .dark\:text-gray-400,
+        html.dark.reader .text-gray-400,
+        html.dark.reader .dark\:text-gray-500 { 
+            color: #71717a !important; 
+        }
+        html.dark.reader .bg-gray-50,
+        html.dark.reader .dark\:bg-system-gray4,
+        html.dark.reader .dark\:bg-system-gray6 { 
+            background-color: #18181b !important; /* Very dark gray */
+        }
+        html.dark.reader .border-gray-100,
+        html.dark.reader .dark\:border-gray-700,
+        html.dark.reader .border-gray-200 {
+            border-color: #3f3f46 !important;
+        }
+        html.dark.reader ::-webkit-scrollbar-thumb {
+            background: #3f3f46;
+        }
+        html.dark.reader .drag-target-top {
+            border-top: 2px solid #71717a !important;
+        }
+        
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -88,11 +212,23 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #A1A1A6;
         }
+
+        /* Input Focus Handling - Native CSS */
+        .input-apple {
+            transition: all 0.2s ease;
+        }
         .input-apple:focus {
             outline: none;
-            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
             border-color: #007AFF;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+            background-color: #FFFFFF;
         }
+        .dark .input-apple:focus {
+            background-color: #2C2C2E; /* system-gray5 */
+            border-color: #0A84FF;
+            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.25);
+        }
+
         .glass {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(20px);
@@ -164,10 +300,66 @@
             border-radius: 50%;
             border: 1px solid rgba(0,0,0,0.1);
         }
+
+        /* Dragging Styles */
+        .dragging {
+            opacity: 0.5;
+            background: #f3f4f6;
+        }
+        .dark .dragging {
+            background: #1f2937;
+        }
+        
+        /* Drag Drop Guide Line */
+        .drag-target-top {
+            border-top: 2px solid #007AFF !important;
+            margin-top: -2px; /* Prevent layout shift */
+        }
+        
+        /* Focus state visibility fix for moving elements */
+        .group:focus-within .input-apple {
+            border-color: #007AFF;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+        }
+        .dark .group:focus-within .input-apple {
+            border-color: #0A84FF;
+            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.25);
+        }
+        html:not(.dark).reader .group:focus-within .input-apple {
+            border-color: #8B6B4E !important;
+            box-shadow: 0 0 0 2px rgba(139, 107, 78, 0.3) !important;
+        }
+        html.dark.reader .group:focus-within .input-apple {
+            border-color: #52525b !important;
+            box-shadow: 0 0 0 2px rgba(82, 82, 91, 0.5) !important;
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
+
+    <script>
+        // --- Inject PWA Manifest ---
+        const manifest = {
+            "name": "Yukkuri Script Editor",
+            "short_name": "ScriptEditor",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#F5F5F7",
+            "theme_color": "#F5F5F7",
+            "icons": [
+                {
+                    "src": "./Logo.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        };
+        const stringManifest = JSON.stringify(manifest);
+        const blob = new Blob([stringManifest], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(blob);
+        document.querySelector('#manifest-placeholder').setAttribute('href', manifestURL);
+    </script>
 
     <script type="text/babel">
         const { useState, useEffect, useRef, useCallback, useLayoutEffect, useMemo } = React;
@@ -189,13 +381,16 @@
                 tipsList: [
                     "ボックス選択中: Ctrl+Alt+矢印キー でその行のキャラクターを変更",
                     "全体: Ctrl+Alt+矢印キー でサイドバーの選択（次のキャラ）を変更",
-                    "Ctrl+Alt+数字キー (1-9) は常にサイドバーの選択を切り替えます"
+                    "Ctrl+Alt+数字キー (1-9) は常にサイドバーの選択を切り替えます",
+                    "Ctrl+F で検索・置換バーを表示します",
+                    "左端のハンドルを掴んでドラッグすると並び替えられます"
                 ],
                 resetDefaults: "初期設定に戻す",
                 done: "完了",
                 selectCharacter: "キャラクターを選択",
                 settings: "設定",
                 toggleDarkMode: "ダークモード切替",
+                toggleReaderMode: "リーダーモード切替",
                 exportCSV: "CSV出力 (Ctrl+Shift+S)",
                 saveProject: "プロジェクト保存 (Ctrl+S)",
                 openProject: "開く (JSON/CSV)",
@@ -204,6 +399,7 @@
                 characterSettings: "キャラクター設定",
                 charName: "名前",
                 charColor: "色",
+                charSpeed: "話速 (文字/秒)",
                 addChar: "キャラ追加",
                 removeChar: "削除",
                 maxCharLimit: "最大9名までです",
@@ -216,6 +412,14 @@
                 errorCharLimitExceeded: "エラー: キャラクター数が制限（9名）を超えています。",
                 errorInvalidFormat: "エラー: 無効なファイル形式です。",
                 repoLink: "リポジトリ",
+                searchPlaceholder: "検索...",
+                replacePlaceholder: "置換...",
+                replace: "置換",
+                replaceAll: "全置換",
+                find: "検索",
+                close: "閉じる",
+                noMatches: "見つかりません",
+                charsSuffix: "文字"
             },
             en: {
                 appTitle: "Yukkuri Script Editor",
@@ -232,13 +436,16 @@
                 tipsList: [
                     "Box Focus: Ctrl+Alt+Arrows cycles current box char.",
                     "Global: Ctrl+Alt+Arrows cycles sidebar selection.",
-                    "Ctrl+Alt+Numbers (1-9) always switches sidebar selection."
+                    "Ctrl+Alt+Numbers (1-9) always switches sidebar selection.",
+                    "Ctrl+F to open Search & Replace.",
+                    "Drag the left handle to reorder lines."
                 ],
                 resetDefaults: "Reset Defaults",
                 done: "Done",
                 selectCharacter: "Select Character",
                 settings: "Settings",
                 toggleDarkMode: "Toggle Dark Mode",
+                toggleReaderMode: "Toggle Reader Mode",
                 exportCSV: "Export CSV (Ctrl+Shift+S)",
                 saveProject: "Save Project (Ctrl+S)",
                 openProject: "Open (JSON/CSV)",
@@ -247,6 +454,7 @@
                 characterSettings: "Character Settings",
                 charName: "Name",
                 charColor: "Color",
+                charSpeed: "Speed (char/s)",
                 addChar: "Add Character",
                 removeChar: "Delete",
                 maxCharLimit: "Max 9 characters",
@@ -259,19 +467,30 @@
                 errorCharLimitExceeded: "Error: Character limit (9) exceeded.",
                 errorInvalidFormat: "Error: Invalid file format.",
                 repoLink: "Repository",
+                searchPlaceholder: "Search...",
+                replacePlaceholder: "Replace...",
+                replace: "Replace",
+                replaceAll: "Replace All",
+                find: "Find",
+                close: "Close",
+                noMatches: "No matches",
+                charsSuffix: "chars"
             }
         };
 
         // Default Data
         const DEFAULT_CHARACTERS = [
-            { id: 'c1', name: '霊夢', short: 'r', color: '#EF4444' },
-            { id: 'c2', name: '魔理沙', short: 'm', color: '#EAB308' },
-            { id: 'c3', name: '妖夢', short: 'y', color: '#10B981' },
-            { id: 'c4', name: '主', short: 'u', color: '#3B82F6' },
+            { id: 'c1', name: '霊夢', short: 'r', color: '#EF4444', speed: 10 },
+            { id: 'c2', name: '魔理沙', short: 'm', color: '#EAB308', speed: 10 },
+            { id: 'c3', name: '妖夢', short: 'y', color: '#10B981', speed: 12 },
+            { id: 'c4', name: '主', short: 'u', color: '#3B82F6', speed: 15 },
         ];
 
         const INITIAL_LINES = [
-            { id: 1, charId: 'c1', text: 'ここにテキストを入力...' }
+            { id: 1, charId: 'c1', text: 'ん、先生。アップデートだよ。' },
+            { id: 2, charId: 'c2', text: 'リーダーモードがライト/ダークそれぞれに対応したぜ。' },
+            { id: 3, charId: 'c3', text: 'ライト時はセピア、ダーク時はコントラストを抑えた色になります。' },
+            { id: 4, charId: 'c1', text: '目への負担を減らして、長時間作業できるようにね。' },
         ];
 
         // Default Key Bindings
@@ -284,6 +503,7 @@
             redo: { key: 'z', ctrl: true, alt: false, shift: true, label: 'Redo' },
             saveProject: { key: 's', ctrl: true, alt: false, shift: false, label: 'Save Project' },
             exportCSV: { key: 's', ctrl: true, alt: false, shift: true, label: 'Export CSV' },
+            find: { key: 'f', ctrl: true, alt: false, shift: false, label: 'Find & Replace' },
         };
 
         const LOCAL_STORAGE_KEY = 'yukkuri_project_data';
@@ -335,7 +555,7 @@
 
             const bgColor = notification.type === 'error' 
                 ? 'bg-red-50 border-red-200 text-red-700 dark:bg-red-900/30 dark:border-red-800 dark:text-red-300' 
-                : 'bg-white border-gray-200 text-gray-800 dark:bg-system-gray5 dark:border-gray-700 dark:text-gray-200';
+                : 'bg-white border-gray-200 text-gray-800 dark:bg-system-gray5 dark:border-gray-700 dark:text-gray-200 reader:bg-[#FBF6E9] reader:border-[#8B6B4E] reader:text-[#433422]';
             
             const iconName = notification.type === 'error' ? 'AlertCircle' : 'CheckCircle';
             const iconColor = notification.type === 'error' ? 'text-red-500' : 'text-green-500';
@@ -347,6 +567,67 @@
                     <button onClick={onClose} className="ml-auto opacity-50 hover:opacity-100 transition-opacity">
                         <Icon name="X" size={16} />
                     </button>
+                </div>
+            );
+        };
+
+        const SearchBar = ({ isOpen, onClose, t, onSearch, onReplace, onReplaceAll, totalMatches, currentMatchIndex }) => {
+            const [searchText, setSearchText] = useState('');
+            const [replaceText, setReplaceText] = useState('');
+            const inputRef = useRef(null);
+
+            useEffect(() => {
+                if (isOpen && inputRef.current) {
+                    inputRef.current.focus();
+                }
+            }, [isOpen]);
+
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-toast w-full max-w-lg px-4 animate-fade-in">
+                    <div className="glass-panel rounded-xl shadow-2xl p-3 flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                            <Icon name="Search" size={16} className="text-gray-400 reader:text-[#8B6B4E]" />
+                            <input 
+                                ref={inputRef}
+                                type="text" 
+                                value={searchText} 
+                                onChange={(e) => { setSearchText(e.target.value); onSearch(e.target.value); }}
+                                placeholder={t.searchPlaceholder}
+                                className="flex-1 bg-transparent text-sm focus:outline-none text-gray-800 dark:text-white reader:text-[#433422]"
+                            />
+                            <div className="text-xs text-gray-400 reader:text-[#A68A6D] font-mono">
+                                {totalMatches > 0 ? `${currentMatchIndex + 1}/${totalMatches}` : t.noMatches}
+                            </div>
+                            <div className="h-4 w-px bg-gray-300 dark:bg-gray-600 reader:bg-[#DCCFB8] mx-1"></div>
+                            <button onClick={() => onSearch(searchText, 'prev')} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 reader:hover:bg-[#E8DCC5] rounded"><Icon name="ChevronUp" size={16} /></button>
+                            <button onClick={() => onSearch(searchText, 'next')} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 reader:hover:bg-[#E8DCC5] rounded"><Icon name="ChevronDown" size={16} /></button>
+                            <button onClick={onClose} className="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 text-red-500 rounded"><Icon name="X" size={16} /></button>
+                        </div>
+                        <div className="flex items-center gap-2 border-t border-gray-100 dark:border-gray-700 reader:border-[#DCCFB8] pt-2">
+                            <Icon name="Replace" size={16} className="text-gray-400 reader:text-[#8B6B4E]" />
+                            <input 
+                                type="text" 
+                                value={replaceText} 
+                                onChange={(e) => setReplaceText(e.target.value)}
+                                placeholder={t.replacePlaceholder}
+                                className="flex-1 bg-transparent text-sm focus:outline-none text-gray-800 dark:text-white reader:text-[#433422]"
+                            />
+                            <button 
+                                onClick={() => onReplace(replaceText)} 
+                                className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 reader:bg-[#F0E6D2] hover:bg-gray-200 dark:hover:bg-gray-600 reader:hover:bg-[#E8DCC5] rounded text-gray-700 dark:text-gray-200 reader:text-[#433422]"
+                            >
+                                {t.replace}
+                            </button>
+                            <button 
+                                onClick={() => onReplaceAll(searchText, replaceText)} 
+                                className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 reader:bg-[#F0E6D2] hover:bg-gray-200 dark:hover:bg-gray-600 reader:hover:bg-[#E8DCC5] rounded text-gray-700 dark:text-gray-200 reader:text-[#433422]"
+                            >
+                                {t.replaceAll}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             );
         };
@@ -373,15 +654,15 @@
             };
 
             return (
-                <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800 last:border-0">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
+                <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800 last:border-0 reader:border-[#DCCFB8]">
+                    <span className="text-sm text-gray-700 dark:text-gray-300 reader:text-[#433422]">{label}</span>
                     <button
                         onClick={() => setIsRecording(true)}
                         onKeyDown={isRecording ? handleKeyDown : undefined}
                         className={`px-3 py-1.5 rounded-md text-xs font-mono border transition-all ${
                             isRecording 
                             ? 'bg-blue-500 text-white border-blue-500 ring-2 ring-blue-200' 
-                            : 'bg-gray-100 dark:bg-system-gray4 text-gray-600 dark:text-gray-400 border-transparent hover:border-gray-300 dark:hover:border-gray-500'
+                            : 'bg-gray-100 dark:bg-system-gray4 reader:bg-[#F0E6D2] text-gray-600 dark:text-gray-400 reader:text-[#5b4636] border-transparent hover:border-gray-300 dark:hover:border-gray-500 reader:hover:border-[#8B6B4E]'
                         }`}
                     >
                         {isRecording ? 'Keys...' : formatBinding(binding)}
@@ -406,7 +687,8 @@
                     id: newId,
                     name: `Character ${characters.length + 1}`,
                     short: String(characters.length + 1),
-                    color: '#8E8E93'
+                    color: '#8E8E93',
+                    speed: 10
                 };
                 setCharacters([...characters, newChar]);
             };
@@ -432,52 +714,52 @@
                 <div className="fixed inset-0 flex items-center justify-center modal-overlay animate-fade-in">
                     <div className="bg-white dark:bg-system-gray5 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden m-4 flex flex-col max-h-[90vh]">
                         {/* Header */}
-                        <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-system-gray5">
-                            <h2 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                        <div className="p-4 border-b border-gray-100 dark:border-gray-700 reader:border-[#DCCFB8] flex justify-between items-center bg-gray-50/50 dark:bg-system-gray5 reader:bg-[#FBF6E9]">
+                            <h2 className="font-semibold text-gray-800 dark:text-white reader:text-[#433422] flex items-center gap-2">
                                 <Icon name="Settings" size={18} />
                                 {t.settingsTitle}
                             </h2>
-                            <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                            <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 reader:hover:bg-[#E8DCC5] transition-colors">
                                 <Icon name="X" size={18} />
                             </button>
                         </div>
 
                         {/* Tabs */}
-                        <div className="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-system-gray5">
+                        <div className="flex border-b border-gray-100 dark:border-gray-700 reader:border-[#DCCFB8] bg-white dark:bg-system-gray5 reader:bg-[#FBF6E9]">
                             <button 
                                 onClick={() => setActiveTab('general')}
-                                className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'general' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'general' ? 'border-blue-500 text-blue-600 dark:text-blue-400 reader:text-[#8B6B4E] reader:border-[#8B6B4E]' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 reader:text-[#A68A6D] reader:hover:text-[#5b4636]'}`}
                             >
                                 {t.tabGeneral}
                             </button>
                             <button 
                                 onClick={() => setActiveTab('characters')}
-                                className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'characters' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'characters' ? 'border-blue-500 text-blue-600 dark:text-blue-400 reader:text-[#8B6B4E] reader:border-[#8B6B4E]' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 reader:text-[#A68A6D] reader:hover:text-[#5b4636]'}`}
                             >
                                 {t.tabCharacters}
                             </button>
                         </div>
 
                         {/* Content */}
-                        <div className="p-6 overflow-y-auto flex-1">
+                        <div className="p-6 overflow-y-auto flex-1 reader:bg-[#FBF6E9]">
                             {activeTab === 'general' && (
                                 <>
                                     <div className="mb-6">
-                                        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t.language}</h3>
+                                        <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 reader:text-[#8B6B4E] uppercase tracking-wider mb-3">{t.language}</h3>
                                         <div className="flex space-x-2">
-                                            <button onClick={() => setLang('ja')} className={`px-3 py-1.5 rounded-md text-sm transition-colors ${lang === 'ja' ? 'bg-blue-apple text-white' : 'bg-gray-100 dark:bg-system-gray4 text-gray-700 dark:text-gray-300'}`}>日本語</button>
-                                            <button onClick={() => setLang('en')} className={`px-3 py-1.5 rounded-md text-sm transition-colors ${lang === 'en' ? 'bg-blue-apple text-white' : 'bg-gray-100 dark:bg-system-gray4 text-gray-700 dark:text-gray-300'}`}>English</button>
+                                            <button onClick={() => setLang('ja')} className={`px-3 py-1.5 rounded-md text-sm transition-colors ${lang === 'ja' ? 'bg-blue-apple text-white reader:bg-[#8B6B4E]' : 'bg-gray-100 dark:bg-system-gray4 reader:bg-[#F0E6D2] text-gray-700 dark:text-gray-300 reader:text-[#433422]'}`}>日本語</button>
+                                            <button onClick={() => setLang('en')} className={`px-3 py-1.5 rounded-md text-sm transition-colors ${lang === 'en' ? 'bg-blue-apple text-white reader:bg-[#8B6B4E]' : 'bg-gray-100 dark:bg-system-gray4 reader:bg-[#F0E6D2] text-gray-700 dark:text-gray-300 reader:text-[#433422]'}`}>English</button>
                                         </div>
                                     </div>
                                     <div className="mb-4">
-                                        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t.editorShortcuts}</h3>
+                                        <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 reader:text-[#8B6B4E] uppercase tracking-wider mb-3">{t.editorShortcuts}</h3>
                                         <div className="space-y-1">
                                             {Object.entries(keyMap).map(([key, binding]) => (
                                                 <KeyBindingEditor key={key} label={binding.label} binding={binding} onChange={(newBinding) => setKeyMap(prev => ({ ...prev, [key]: newBinding }))} />
                                             ))}
                                         </div>
                                     </div>
-                                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl text-xs text-blue-600 dark:text-blue-300 leading-relaxed">
+                                    <div className="bg-blue-50 dark:bg-blue-900/20 reader:bg-[#F0E6D2] p-4 rounded-xl text-xs text-blue-600 dark:text-blue-300 reader:text-[#5b4636] leading-relaxed">
                                         <p className="font-semibold mb-1">{t.tipsTitle}</p>
                                         <ul className="list-disc pl-4 space-y-1">{t.tipsList.map((tip, idx) => <li key={idx}>{tip}</li>)}</ul>
                                     </div>
@@ -491,11 +773,11 @@
                                 <div className="space-y-4">
                                     <div className="space-y-2">
                                         {characters.map((char, index) => (
-                                            <div key={char.id} className="flex items-center space-x-3 p-2 bg-gray-50 dark:bg-system-gray4/50 rounded-lg animate-fade-in">
-                                                <div className="flex-shrink-0 flex items-center justify-center w-8 text-xs text-gray-400 font-mono">
+                                            <div key={char.id} className="flex items-center space-x-3 p-2 bg-gray-50 dark:bg-system-gray4/50 reader:bg-[#F0E6D2] rounded-lg animate-fade-in">
+                                                <div className="flex-shrink-0 flex items-center justify-center w-8 text-xs text-gray-400 font-mono reader:text-[#A68A6D]">
                                                     {index + 1}
                                                 </div>
-                                                <div className="flex-shrink-0 relative w-8 h-8 rounded-full overflow-hidden ring-1 ring-gray-200 dark:ring-gray-600">
+                                                <div className="flex-shrink-0 relative w-8 h-8 rounded-full overflow-hidden ring-1 ring-gray-200 dark:ring-gray-600 reader:ring-[#DCCFB8]">
                                                     <input 
                                                         type="color" 
                                                         value={char.color} 
@@ -503,19 +785,29 @@
                                                         className="absolute inset-0 w-full h-full scale-150 cursor-pointer p-0 border-0"
                                                     />
                                                 </div>
-                                                <div className="flex-1">
+                                                <div className="flex-1 grid grid-cols-3 gap-2">
                                                     <input 
                                                         type="text" 
                                                         value={char.name}
                                                         onChange={(e) => handleUpdateCharacter(char.id, 'name', e.target.value)}
-                                                        className="w-full bg-transparent border-b border-transparent focus:border-blue-500 focus:outline-none text-sm text-gray-800 dark:text-gray-100 px-1 py-0.5"
-                                                        placeholder="Name"
+                                                        className="col-span-2 bg-transparent border-b border-transparent focus:border-blue-500 reader:focus:border-[#8B6B4E] focus:outline-none text-sm text-gray-800 dark:text-gray-100 reader:text-[#433422] px-1 py-0.5"
+                                                        placeholder={t.charName}
                                                     />
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-[10px] text-gray-400 reader:text-[#A68A6D] whitespace-nowrap">Speed:</span>
+                                                        <input 
+                                                            type="number" 
+                                                            value={char.speed || 10}
+                                                            onChange={(e) => handleUpdateCharacter(char.id, 'speed', parseInt(e.target.value))}
+                                                            className="w-full bg-transparent border-b border-transparent focus:border-blue-500 reader:focus:border-[#8B6B4E] focus:outline-none text-sm text-gray-800 dark:text-gray-100 reader:text-[#433422] px-1 py-0.5 text-center"
+                                                            placeholder="10"
+                                                        />
+                                                    </div>
                                                 </div>
                                                 <button 
                                                     onClick={() => handleDeleteCharacter(char.id)}
                                                     disabled={characters.length <= 1}
-                                                    className={`p-1.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ${characters.length <= 1 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                                    className={`p-1.5 rounded text-gray-400 reader:text-[#A68A6D] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 reader:hover:bg-[#E8DCC5] transition-colors ${characters.length <= 1 ? 'opacity-30 cursor-not-allowed' : ''}`}
                                                 >
                                                     <Icon name="Trash2" size={16} />
                                                 </button>
@@ -526,7 +818,7 @@
                                     {characters.length < 9 ? (
                                         <button 
                                             onClick={handleAddCharacter}
-                                            className="w-full py-2.5 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 hover:text-blue-500 hover:border-blue-400 dark:hover:text-blue-400 text-sm transition-all flex items-center justify-center space-x-2 bg-gray-50/50 dark:bg-transparent"
+                                            className="w-full py-2.5 border border-dashed border-gray-300 dark:border-gray-600 reader:border-[#DCCFB8] rounded-lg text-gray-500 dark:text-gray-400 reader:text-[#8B6B4E] hover:text-blue-500 hover:border-blue-400 dark:hover:text-blue-400 reader:hover:text-[#5b4636] reader:hover:border-[#8B6B4E] text-sm transition-all flex items-center justify-center space-x-2 bg-gray-50/50 dark:bg-transparent reader:bg-[#F0E6D2]"
                                         >
                                             <Icon name="Plus" size={16} />
                                             <span>{t.addChar}</span>
@@ -541,8 +833,8 @@
                         </div>
 
                         {/* Footer */}
-                        <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-system-gray6 text-right">
-                            <button onClick={onClose} className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
+                        <div className="p-4 border-t border-gray-100 dark:border-gray-700 reader:border-[#DCCFB8] bg-gray-50 dark:bg-system-gray6 reader:bg-[#F0E6D2] text-right">
+                            <button onClick={onClose} className="px-4 py-2 bg-black dark:bg-white reader:bg-[#433422] text-white dark:text-black reader:text-[#F4ECD8] rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
                                 {t.done}
                             </button>
                         </div>
@@ -571,27 +863,48 @@
                 return DEFAULT_CHARACTERS[0].id;
             });
             const [lang, setLang] = useState(() => getInitialState('yukkuri_lang', 'ja'));
-            const [keyMap, setKeyMap] = useState(() => getInitialState('yukkuri_keymap', DEFAULT_KEY_MAP));
+            // Merge loaded keymap with default to ensure new keys exist
+            const [keyMap, setKeyMap] = useState(() => {
+                const loaded = getInitialState('yukkuri_keymap', DEFAULT_KEY_MAP);
+                return { ...DEFAULT_KEY_MAP, ...loaded };
+            });
             const [scenarioTitle, setScenarioTitle] = useState(() => getInitialState('yukkuri_title', '無題のシナリオ'));
+            
+            // Themes Management
             const [isDarkMode, setIsDarkMode] = useState(() => {
                 const saved = localStorage.getItem('yukkuri_darkmode');
                 if (saved !== null) return JSON.parse(saved);
                 return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            });
+            
+            const [isReaderMode, setIsReaderMode] = useState(() => {
+                const saved = localStorage.getItem('yukkuri_reader_mode');
+                if (saved !== null) return JSON.parse(saved);
+                return false;
             });
 
             const t = TRANSLATIONS[lang];
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
             const [settingsInitialTab, setSettingsInitialTab] = useState('general');
             const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+            // focusTarget is kept for state tracking, but visual focus is now CSS based
             const [focusTarget, setFocusTarget] = useState({ index: 0, field: 'text' });
             const [isEditingTitle, setIsEditingTitle] = useState(false);
-            const [notification, setNotification] = useState(null); // { message: '', type: 'success'|'error' }
+            const [notification, setNotification] = useState(null); 
+            const [isSearchOpen, setIsSearchOpen] = useState(false);
+            const [searchResults, setSearchResults] = useState([]); // Array of line indices
+            const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+            const [dragOverIndex, setDragOverIndex] = useState(null); 
 
             const lineRefs = useRef({});
             const dropdownRef = useRef(null);
             const debounceTimeoutRef = useRef(null);
             const fileInputRef = useRef(null);
             const titleInputRef = useRef(null);
+            
+            // Sortable Ref
+            const sortableRef = useRef(null);
+            const sortableInstance = useRef(null);
 
             // -- Persist Changes --
             useEffect(() => localStorage.setItem('yukkuri_lines', JSON.stringify(lines)), [lines]);
@@ -601,6 +914,7 @@
             useEffect(() => localStorage.setItem('yukkuri_keymap', JSON.stringify(keyMap)), [keyMap]);
             useEffect(() => localStorage.setItem('yukkuri_title', JSON.stringify(scenarioTitle)), [scenarioTitle]);
             useEffect(() => localStorage.setItem('yukkuri_darkmode', JSON.stringify(isDarkMode)), [isDarkMode]);
+            useEffect(() => localStorage.setItem('yukkuri_reader_mode', JSON.stringify(isReaderMode)), [isReaderMode]);
 
             // Notification Helper
             const showNotification = (message, type = 'success') => {
@@ -608,12 +922,11 @@
                 setTimeout(() => setNotification(null), 4000);
             };
 
-            // Initial Load Notification
             useEffect(() => {
                 if (scenarioTitle) {
                     showNotification(`${t.loadedProject}${scenarioTitle}`);
                 }
-            }, []); // Run once on mount
+            }, []); 
 
             // History logic 
             const [history, setHistory] = useState([lines]);
@@ -644,14 +957,36 @@
             const canUndo = historyIndex > 0;
             const canRedo = historyIndex < history.length - 1;
 
+            // -- SortableJS Initialization --
+            useEffect(() => {
+                if (sortableRef.current && !sortableInstance.current) {
+                    sortableInstance.current = Sortable.create(sortableRef.current, {
+                        animation: 150,
+                        handle: '.drag-handle', // Drag handle selector
+                        ghostClass: 'sortable-ghost',
+                        dragClass: 'sortable-drag',
+                        onEnd: (evt) => {
+                            const oldIndex = evt.oldIndex;
+                            const newIndex = evt.newIndex;
+                            if (oldIndex !== newIndex) {
+                                setLines((prevLines) => {
+                                    const newLines = [...prevLines];
+                                    const [movedItem] = newLines.splice(oldIndex, 1);
+                                    newLines.splice(newIndex, 0, movedItem);
+                                    return newLines;
+                                });
+                            }
+                        }
+                    });
+                }
+            }, []);
+
             // -- Effects --
-            
-            // Fix for textarea height on load/update
             useLayoutEffect(() => {
                 Object.values(lineRefs.current).forEach(el => {
                     if (el && el.tagName === 'TEXTAREA') {
-                        el.style.height = 'auto'; // Reset to shrink
-                        el.style.height = el.scrollHeight + 'px'; // Grow to fit
+                        el.style.height = 'auto';
+                        el.style.height = el.scrollHeight + 'px';
                     }
                 });
             }, [lines]);
@@ -662,10 +997,22 @@
                 if (lineRefs.current[refKey]) lineRefs.current[refKey].focus();
             }, [focusTarget, lines.length]);
 
+            // Apply Theme
             useEffect(() => {
-                if (isDarkMode) document.documentElement.classList.add('dark');
-                else document.documentElement.classList.remove('dark');
-            }, [isDarkMode]);
+                const html = document.documentElement;
+                
+                if (isDarkMode) {
+                    html.classList.add('dark');
+                } else {
+                    html.classList.remove('dark');
+                }
+
+                if (isReaderMode) {
+                    html.classList.add('reader');
+                } else {
+                    html.classList.remove('reader');
+                }
+            }, [isDarkMode, isReaderMode]);
 
             useEffect(() => {
                 const handleClickOutside = (event) => {
@@ -688,6 +1035,58 @@
                     if (characters.length > 0) setActiveCharId(characters[0].id);
                 }
             }, [characters, activeCharId]);
+
+            // -- Search Logic --
+            const handleSearch = (query, dir = 'next') => {
+                if (!query) {
+                    setSearchResults([]);
+                    return;
+                }
+                
+                const results = lines.reduce((acc, line, idx) => {
+                    if (line.text.includes(query)) acc.push(idx);
+                    return acc;
+                }, []);
+                
+                setSearchResults(results);
+
+                if (results.length > 0) {
+                    let nextIdx = 0;
+                    if (dir === 'next') {
+                        nextIdx = (currentMatchIndex + 1) % results.length;
+                    } else if (dir === 'prev') {
+                        nextIdx = (currentMatchIndex - 1 + results.length) % results.length;
+                    }
+                    if (results.length !== searchResults.length) nextIdx = 0;
+                    
+                    setCurrentMatchIndex(nextIdx);
+                    const lineIdx = results[nextIdx];
+                    setFocusTarget({ index: lineIdx, field: 'text' });
+                }
+            };
+
+            const executeReplaceAction = (searchText, replaceText, all = false) => {
+                if (!searchText) return;
+                const newLines = lines.map(line => {
+                    if (!line.text.includes(searchText)) return line;
+                    if (all) {
+                        return { ...line, text: line.text.split(searchText).join(replaceText) };
+                    } else {
+                        return { ...line, text: line.text.replace(searchText, replaceText) }; 
+                    }
+                });
+                
+                if (!all && searchResults.length > 0) {
+                    const targetIdx = searchResults[currentMatchIndex];
+                    const line = lines[targetIdx];
+                    const newText = line.text.replace(searchText, replaceText);
+                    updateLine(targetIdx, 'text', newText);
+                    handleSearch(searchText); 
+                } else {
+                    updateLinesWithHistory(newLines);
+                    handleSearch(searchText);
+                }
+            };
 
             // -- Actions --
             const updateLine = (index, field, value) => {
@@ -745,14 +1144,7 @@
             };
 
             const saveProject = () => {
-                const projectData = {
-                    version: 1,
-                    timestamp: new Date().toISOString(),
-                    title: scenarioTitle,
-                    characters,
-                    activeCharId,
-                    lines
-                };
+                const projectData = { version: 1, timestamp: new Date().toISOString(), title: scenarioTitle, characters, activeCharId, lines };
                 const jsonContent = JSON.stringify(projectData, null, 2);
                 const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
@@ -764,53 +1156,30 @@
                 document.body.removeChild(link);
             };
 
-            const triggerLoadProject = () => {
-                if (fileInputRef.current) {
-                    fileInputRef.current.click();
-                }
-            };
+            const triggerLoadProject = () => { if (fileInputRef.current) fileInputRef.current.click(); };
 
             const parseCSV = (text) => {
                 const lines = text.split(/\r\n|\n/);
                 const parsedLines = [];
                 let startIndex = 0;
                 if (lines[0].includes('Character') || lines[0].includes('Text')) startIndex = 1;
-
                 for (let i = startIndex; i < lines.length; i++) {
                     const line = lines[i];
                     if (!line.trim()) continue;
-                    
-                    let charName = '';
-                    let textVal = '';
-                    
+                    let charName = ''; let textVal = '';
                     const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
                     if (!matches && line.includes(',')) {
-                        const parts = line.split(',');
-                        charName = parts[0];
-                        textVal = parts.slice(1).join(','); 
+                        const parts = line.split(','); charName = parts[0]; textVal = parts.slice(1).join(','); 
                     } else {
                         const regex = /(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)/g;
-                        let m;
-                        const cols = [];
-                        while ((m = regex.exec(line)) !== null) {
-                            let val = m[1].replace(/^"|"$/g, '').replace(/""/g, '"');
-                            cols.push(val);
-                        }
-                        if (cols.length >= 2) {
-                            charName = cols[0];
-                            textVal = cols[1];
-                        }
+                        let m; const cols = [];
+                        while ((m = regex.exec(line)) !== null) { let val = m[1].replace(/^"|"$/g, '').replace(/""/g, '"'); cols.push(val); }
+                        if (cols.length >= 2) { charName = cols[0]; textVal = cols[1]; }
                     }
-
                     if (charName || textVal) {
                         let char = characters.find(c => c.name === charName);
                         const cid = char ? char.id : characters[0].id;
-                        
-                        parsedLines.push({
-                            id: Date.now() + i,
-                            charId: cid,
-                            text: textVal || ''
-                        });
+                        parsedLines.push({ id: Date.now() + i, charId: cid, text: textVal || '' });
                     }
                 }
                 return parsedLines;
@@ -825,41 +1194,26 @@
                     if (file.name.endsWith('.json')) {
                         try {
                             const projectData = JSON.parse(content);
-                            
-                            // Validation
                             if (!projectData.lines || !Array.isArray(projectData.lines)) throw new Error("Invalid format");
-                            if (projectData.characters && projectData.characters.length > 9) {
-                                showNotification(t.errorCharLimitExceeded, 'error');
-                                return;
-                            }
-
+                            if (projectData.characters && projectData.characters.length > 9) { showNotification(t.errorCharLimitExceeded, 'error'); return; }
                             if (projectData.lines && Array.isArray(projectData.lines) && projectData.characters && Array.isArray(projectData.characters)) {
-                                setCharacters(projectData.characters);
-                                setLines(projectData.lines);
+                                setCharacters(projectData.characters); setLines(projectData.lines);
                                 if (projectData.activeCharId) setActiveCharId(projectData.activeCharId);
                                 if (projectData.title) setScenarioTitle(projectData.title);
                                 updateLinesWithHistory(projectData.lines);
                                 showNotification(`${t.loadedProject}${projectData.title || 'Untitled'}`);
-                            } else {
-                                showNotification(t.errorInvalidFormat, 'error');
-                            }
+                            } else { showNotification(t.errorInvalidFormat, 'error'); }
                         } catch (err) { showNotification(t.importError, 'error'); }
                     } else if (file.name.endsWith('.csv')) {
                         try {
                             const newLines = parseCSV(content);
                             if (newLines.length > 0) {
-                                setLines(newLines);
-                                updateLinesWithHistory(newLines);
-                                const title = file.name.replace('.csv', '');
-                                setScenarioTitle(title);
+                                setLines(newLines); updateLinesWithHistory(newLines);
+                                const title = file.name.replace('.csv', ''); setScenarioTitle(title);
                                 showNotification(`${t.csvImportSuccess}: ${title}`);
-                            } else {
-                                showNotification(t.importError, 'error');
-                            }
+                            } else { showNotification(t.importError, 'error'); }
                         } catch (err) { showNotification(t.importError, 'error'); }
-                    } else {
-                        showNotification(t.errorInvalidFormat, 'error');
-                    }
+                    } else { showNotification(t.errorInvalidFormat, 'error'); }
                 };
                 reader.readAsText(file);
                 e.target.value = ''; 
@@ -870,6 +1224,7 @@
                 if (isKeyMatch(e, keyMap.exportCSV)) { e.preventDefault(); exportCSV(); }
                 if (isKeyMatch(e, keyMap.undo)) { e.preventDefault(); if(canUndo) undo(); }
                 if (isKeyMatch(e, keyMap.redo)) { e.preventDefault(); if(canRedo) redo(); }
+                if (isKeyMatch(e, keyMap.find)) { e.preventDefault(); setIsSearchOpen(true); }
                 
                 if ((e.ctrlKey || e.metaKey) && e.altKey && !isNaN(e.key)) {
                     e.preventDefault();
@@ -879,7 +1234,6 @@
                 }
                 
                 const isInputActive = ['TEXTAREA', 'INPUT'].includes(document.activeElement?.tagName) && !document.activeElement.classList.contains('hidden-input');
-                
                 if (!isInputActive && (e.ctrlKey || e.metaKey) && e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
                     e.preventDefault();
                     const currentCharIndex = characters.findIndex(c => c.id === activeCharId);
@@ -919,10 +1273,21 @@
             };
 
             return (
-                <div className={`flex h-screen overflow-hidden text-sm transition-colors duration-300 ${isDarkMode ? 'dark bg-black' : 'bg-[#F5F5F7]'}`}>
+                <div className={`flex h-screen overflow-hidden text-sm transition-colors duration-300 ${isDarkMode ? 'dark bg-black' : isReaderMode ? 'reader bg-[#F4ECD8]' : 'bg-[#F5F5F7]'}`}>
                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".json,.csv" className="hidden" />
                     
                     <ToastNotification notification={notification} onClose={() => setNotification(null)} />
+
+                    <SearchBar 
+                        isOpen={isSearchOpen} 
+                        onClose={() => setIsSearchOpen(false)} 
+                        t={t}
+                        onSearch={(query, dir) => handleSearch(query, dir)}
+                        onReplace={(replaceText) => executeReplaceAction(document.querySelector('input[placeholder="' + t.searchPlaceholder + '"]').value, replaceText, false)}
+                        onReplaceAll={(searchText, replaceText) => executeReplaceAction(searchText, replaceText, true)}
+                        totalMatches={searchResults.length}
+                        currentMatchIndex={currentMatchIndex}
+                    />
 
                     <SettingsModal 
                         isOpen={isSettingsOpen} 
@@ -1016,6 +1381,7 @@
                             <div className="flex items-center space-x-2">
                                 <button onClick={() => { setSettingsInitialTab('general'); setIsSettingsOpen(true); }} className="p-2 rounded-lg text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors" title={t.settings}><Icon name="Settings" size={18} /></button>
                                 <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-lg text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors" title={t.toggleDarkMode}>{isDarkMode ? <Icon name="Sun" size={18} /> : <Icon name="Moon" size={18} />}</button>
+                                <button onClick={() => setIsReaderMode(!isReaderMode)} className={`p-2 rounded-lg transition-colors ${isReaderMode ? 'text-blue-500 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/20' : 'text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700'}`} title={t.toggleReaderMode}><Icon name="BookOpen" size={18} /></button>
                                 <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
                                 <button onClick={triggerLoadProject} className="p-2 rounded-lg text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors" title={t.openProject}><Icon name="FolderOpen" size={18} /></button>
                                 <button onClick={saveProject} className="p-2 rounded-lg text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors" title={t.saveProject}><Icon name="Save" size={18} /></button>
@@ -1024,17 +1390,33 @@
                         </header>
 
                         <div className="flex-1 overflow-y-auto pt-24 pb-32 px-8 sm:px-12 lg:px-24 scroll-smooth">
-                            <div className="max-w-4xl mx-auto space-y-3">
+                            <div ref={sortableRef} className="max-w-4xl mx-auto space-y-3 pb-32">
                                 {lines.map((line, index) => {
-                                    const currentChar = characters.find(c => c.id === line.charId) || characters[0] || { name: '?', color: '#ccc' };
+                                    const currentChar = characters.find(c => c.id === line.charId) || characters[0] || { name: '?', color: '#ccc', speed: 10 };
                                     const isDropdownOpen = openDropdownIndex === index;
+                                    const duration = (line.text.length / (currentChar.speed || 10)).toFixed(1);
                                     
+                                    // Use CSS-based focus styling on parent div via :focus-within instead of JS state for smoother UI
+                                    const containerClasses = "group flex items-start space-x-4 animate-fade-in";
+                                    
+                                    // Base wrapper classes
+                                    const baseWrapperClasses = "input-apple w-full border rounded-xl px-4 py-3 text-base resize-none overflow-hidden transition-all shadow-sm";
+                                    
+                                    // Dynamic styling based on theme is handled by CSS overrides mostly, but basic Tailwind classes here
+                                    const wrapperClasses = `${baseWrapperClasses} bg-white dark:bg-system-gray5 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-300 dark:placeholder-gray-600`;
+
                                     return (
                                         <div 
                                             key={line.id} 
-                                            className="group flex items-start space-x-4 animate-fade-in"
+                                            className={containerClasses}
                                             style={{ zIndex: isDropdownOpen ? 50 : 'auto', position: 'relative' }}
                                         >
+                                            <div className="flex flex-col items-center gap-2 pt-3 drag-handle cursor-grab active:cursor-grabbing">
+                                                <div className="text-gray-300 hover:text-gray-500 px-1">
+                                                    <Icon name="GripVertical" size={14} />
+                                                </div>
+                                            </div>
+
                                             <div className="flex-shrink-0 pt-1 relative">
                                                 <div 
                                                     className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all cursor-pointer hover:shadow-md ring-1 ring-black/5 dark:ring-white/10 active:scale-95"
@@ -1057,24 +1439,35 @@
                                                         </div>
                                                     </div>
                                                 )}
-                                                <div className="absolute -bottom-5 left-0 w-full text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                {/* Use group-focus-within for showing the name */}
+                                                <div className={`absolute -bottom-5 left-0 w-full text-center transition-opacity pointer-events-none opacity-0 group-hover:opacity-100 group-focus-within:opacity-100`}>
                                                     <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap">{currentChar.name}</span>
                                                 </div>
                                             </div>
-                                            <div className="flex-1 relative z-0">
+                                            <div className="flex-1 relative z-0 group/textarea">
                                                 <textarea
                                                     ref={el => lineRefs.current[`${index}-text`] = el}
                                                     value={line.text}
                                                     onChange={(e) => updateLine(index, 'text', e.target.value)}
                                                     onKeyDown={(e) => handleLineKeyDown(e, index)}
+                                                    onFocus={() => setFocusTarget({ index, field: 'text' })}
                                                     placeholder={t.placeholder}
                                                     rows={1}
-                                                    className="input-apple w-full bg-white dark:bg-system-gray5 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-base text-gray-800 dark:text-gray-100 placeholder-gray-300 dark:placeholder-gray-600 shadow-sm focus:bg-white dark:focus:bg-system-gray5 resize-none overflow-hidden transition-all"
+                                                    className={wrapperClasses}
                                                     style={{ minHeight: '48px', height: 'auto' }}
                                                     onInput={(e) => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
                                                 />
-                                                <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={() => removeLine(index)} className="p-1 hover:bg-red-50 text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 rounded-md transition-colors" tabIndex={-1} title={`${t.deleteLine} (Ctrl+Backspace)`}><Icon name="X" size={14} /></button>
+                                                {/* Meta info visibility using pure CSS group-focus-within for reliable instant feedback */}
+                                                <div className={`absolute right-3 top-3 flex items-center gap-2 transition-opacity opacity-0 group-hover/textarea:opacity-100 group-focus-within:opacity-100`}>
+                                                    <span className="text-[10px] text-gray-400 bg-gray-50 dark:bg-gray-800/50 px-1.5 py-0.5 rounded border border-gray-100 dark:border-gray-700">
+                                                        {line.text.length} {t.charsSuffix}
+                                                    </span>
+                                                    <span className="text-[10px] text-gray-400 bg-gray-50 dark:bg-gray-800/50 px-1.5 py-0.5 rounded border border-gray-100 dark:border-gray-700">
+                                                        {duration}s
+                                                    </span>
+                                                    <button onClick={() => removeLine(index)} className="p-1 hover:bg-red-50 text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 rounded-md transition-colors" tabIndex={-1} title={`${t.deleteLine} (Ctrl+Backspace)`}>
+                                                        <Icon name="X" size={14} />
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
