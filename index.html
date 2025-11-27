@@ -215,6 +215,7 @@
                 loadedProject: "プロジェクトを読み込みました: ",
                 errorCharLimitExceeded: "エラー: キャラクター数が制限（9名）を超えています。",
                 errorInvalidFormat: "エラー: 無効なファイル形式です。",
+                repoLink: "リポジトリ",
             },
             en: {
                 appTitle: "Yukkuri Script Editor",
@@ -257,6 +258,7 @@
                 loadedProject: "Project Loaded: ",
                 errorCharLimitExceeded: "Error: Character limit (9) exceeded.",
                 errorInvalidFormat: "Error: Invalid file format.",
+                repoLink: "Repository",
             }
         };
 
@@ -269,10 +271,7 @@
         ];
 
         const INITIAL_LINES = [
-            { id: 1, charId: 'c1', text: 'ん、先生。左上のアイコンを変更したよ。' },
-            { id: 2, charId: 'c2', text: 'ファビコンも一緒に ./Logo.png になってるはずだぜ。' },
-            { id: 3, charId: 'c3', text: 'これで少し見た目が変わりましたね。' },
-            { id: 4, charId: 'c1', text: '気に入ってくれるといいな。' },
+            { id: 1, charId: 'c1', text: 'ここにテキストを入力...' }
         ];
 
         // Default Key Bindings
@@ -970,11 +969,15 @@
                             </div>
                         </div>
                         <div className="mt-auto p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-system-gray6">
-                            <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">{t.shortcuts}</h3>
-                            <div className="space-y-2 text-xs text-gray-500 dark:text-gray-400">
-                                <div className="flex justify-between"><span>{t.newLine}</span> <kbd className="font-mono bg-white dark:bg-system-gray4 px-1 border dark:border-gray-600 rounded shadow-sm">Ctrl+Enter</kbd></div>
-                                <div className="flex justify-between"><span>{t.switchActive}</span> <kbd className="font-mono bg-white dark:bg-system-gray4 px-1 border dark:border-gray-600 rounded shadow-sm">Ctrl+Alt+↑↓</kbd></div>
-                                <div className="flex justify-between"><span>{t.deleteLine}</span> <kbd className="font-mono bg-white dark:bg-system-gray4 px-1 border dark:border-gray-600 rounded shadow-sm">Ctrl+Bksp</kbd></div>
+                            <div className="flex flex-col space-y-3">
+                                <a href="https://github.com/lineside0418" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors text-xs">
+                                    <Icon name="Github" size={14} />
+                                    <span>@lineside0418</span>
+                                </a>
+                                <a href="https://lineside0418.github.io/YukkuriScriptEditor" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors text-xs">
+                                    <Icon name="Code" size={14} />
+                                    <span>{t.repoLink}</span>
+                                </a>
                             </div>
                         </div>
                     </aside>
