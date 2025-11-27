@@ -3,7 +3,7 @@
 ゆっくり実況などの台本作成を効率化する、Webブラウザ上で動作するスクリプトエディタです。
 思考を止めずにキーボード操作だけで執筆できるよう設計されており、YMM4（ゆっくりムービーメーカー4）互換のCSV出力に対応しています。
 
-[Webサイトへ](https://lineside0418.github.io/YukkuriScri[ptEditor/)
+[Webサイトへ](https://lineside0418.github.io/YukkuriScriptEditor/)
 
 
 
