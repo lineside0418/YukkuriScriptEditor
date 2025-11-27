@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yukkuri Script Editor</title>
+    <link rel="icon" href="./Logo.png" />
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS with Dark Mode Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        system: {
+                            gray1: '#8E8E93',
+                            gray2: '#636366',
+                            gray3: '#48484A',
+                            gray4: '#3A3A3C',
+                            gray5: '#2C2C2E',
+                            gray6: '#1C1C1E',
+                        },
+                        blue: {
+                            apple: '#007AFF',
+                        },
+                        red: {
+                            apple: '#FF3B30',
+                        },
+                        green: {
+                            apple: '#34C759',
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                    },
+                    zIndex: {
+                        '60': '60',
+                        '70': '70',
+                        'toast': '100',
+                        'modal': '1000',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', 'Zen Kaku Gothic New', 'Noto Sans JP', sans-serif;
+            background-color: #F5F5F7;
+            color: #1D1D1F;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .dark body {
+            background-color: #000000;
+            color: #F5F5F7;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D1D6;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #48484A;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A1A1A6;
+        }
+        .input-apple:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+            border-color: #007AFF;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .dark .glass {
+            background: rgba(28, 28, 30, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .dark .glass-panel {
+            background: rgba(30, 30, 32, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .animate-slide-in-right {
+            animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .animate-scale-in {
+            animation: scaleIn 0.1s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(2px);
+            z-index: 1000;
+        }
+        .dark .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Color Picker Reset */
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            overflow: hidden;
+            padding: 0;
+            background: none;
+            cursor: pointer;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback, useLayoutEffect, useMemo } = React;
+
+        // --- Localization Data ---
+        const TRANSLATIONS = {
+            ja: {
+                appTitle: "ゆっくりスクリプトエディタ",
+                activeCharacter: "選択中のキャラクター",
+                shortcuts: "ショートカット",
+                newLine: "新しい行",
+                deleteLine: "行削除",
+                switchActive: "キャラ切り替え",
+                untitled: "無題のシナリオ",
+                linesSuffix: "行",
+                settingsTitle: "設定",
+                editorShortcuts: "ショートカット設定",
+                tipsTitle: "ヒント:",
+                tipsList: [
+                    "ボックス選択中: Ctrl+Alt+矢印キー でその行のキャラクターを変更",
+                    "全体: Ctrl+Alt+矢印キー でサイドバーの選択（次のキャラ）を変更",
+                    "Ctrl+Alt+数字キー (1-9) は常にサイドバーの選択を切り替えます"
+                ],
+                resetDefaults: "初期設定に戻す",
+                done: "完了",
+                selectCharacter: "キャラクターを選択",
+                settings: "設定",
+                toggleDarkMode: "ダークモード切替",
+                exportCSV: "CSV出力 (Ctrl+Shift+S)",
+                saveProject: "プロジェクト保存 (Ctrl+S)",
+                openProject: "開く (JSON/CSV)",
+                language: "言語 (Language)",
+                placeholder: "セリフを入力...",
+                characterSettings: "キャラクター設定",
+                charName: "名前",
+                charColor: "色",
+                addChar: "キャラ追加",
+                removeChar: "削除",
+                maxCharLimit: "最大9名までです",
+                tabGeneral: "一般・ショートカット",
+                tabCharacters: "キャラクター",
+                confirmReset: "本当に初期設定に戻しますか？",
+                importError: "ファイルの読み込みに失敗しました",
+                csvImportSuccess: "CSVをインポートしました",
+                loadedProject: "プロジェクトを読み込みました: ",
+                errorCharLimitExceeded: "エラー: キャラクター数が制限（9名）を超えています。",
+                errorInvalidFormat: "エラー: 無効なファイル形式です。",
+            },
+            en: {
+                appTitle: "Yukkuri Script Editor",
+                activeCharacter: "Active Character",
+                shortcuts: "Shortcuts",
+                newLine: "New Line",
+                deleteLine: "Delete Line",
+                switchActive: "Switch Active",
+                untitled: "Untitled Scenario",
+                linesSuffix: "lines",
+                settingsTitle: "Settings",
+                editorShortcuts: "Shortcut Config",
+                tipsTitle: "Tips:",
+                tipsList: [
+                    "Box Focus: Ctrl+Alt+Arrows cycles current box char.",
+                    "Global: Ctrl+Alt+Arrows cycles sidebar selection.",
+                    "Ctrl+Alt+Numbers (1-9) always switches sidebar selection."
+                ],
+                resetDefaults: "Reset Defaults",
+                done: "Done",
+                selectCharacter: "Select Character",
+                settings: "Settings",
+                toggleDarkMode: "Toggle Dark Mode",
+                exportCSV: "Export CSV (Ctrl+Shift+S)",
+                saveProject: "Save Project (Ctrl+S)",
+                openProject: "Open (JSON/CSV)",
+                language: "Language",
+                placeholder: "Enter dialogue...",
+                characterSettings: "Character Settings",
+                charName: "Name",
+                charColor: "Color",
+                addChar: "Add Character",
+                removeChar: "Delete",
+                maxCharLimit: "Max 9 characters",
+                tabGeneral: "General / Keys",
+                tabCharacters: "Characters",
+                confirmReset: "Are you sure you want to reset?",
+                importError: "Failed to import file",
+                csvImportSuccess: "Imported CSV successfully",
+                loadedProject: "Project Loaded: ",
+                errorCharLimitExceeded: "Error: Character limit (9) exceeded.",
+                errorInvalidFormat: "Error: Invalid file format.",
+            }
+        };
+
+        // Default Data
+        const DEFAULT_CHARACTERS = [
+            { id: 'c1', name: '霊夢', short: 'r', color: '#EF4444' },
+            { id: 'c2', name: '魔理沙', short: 'm', color: '#EAB308' },
+            { id: 'c3', name: '妖夢', short: 'y', color: '#10B981' },
+            { id: 'c4', name: '主', short: 'u', color: '#3B82F6' },
+        ];
+
+        const INITIAL_LINES = [
+            { id: 1, charId: 'c1', text: 'ん、先生。左上のアイコンを変更したよ。' },
+            { id: 2, charId: 'c2', text: 'ファビコンも一緒に ./Logo.png になってるはずだぜ。' },
+            { id: 3, charId: 'c3', text: 'これで少し見た目が変わりましたね。' },
+            { id: 4, charId: 'c1', text: '気に入ってくれるといいな。' },
+        ];
+
+        // Default Key Bindings
+        const DEFAULT_KEY_MAP = {
+            newLine: { key: 'Enter', ctrl: true, alt: false, shift: false, label: 'New Line' },
+            deleteLine: { key: 'Backspace', ctrl: true, alt: false, shift: false, label: 'Delete Line' },
+            moveFocusUp: { key: 'ArrowUp', ctrl: true, alt: false, shift: false, label: 'Focus Up' },
+            moveFocusDown: { key: 'ArrowDown', ctrl: true, alt: false, shift: false, label: 'Focus Down' },
+            undo: { key: 'z', ctrl: true, alt: false, shift: false, label: 'Undo' },
+            redo: { key: 'z', ctrl: true, alt: false, shift: true, label: 'Redo' },
+            saveProject: { key: 's', ctrl: true, alt: false, shift: false, label: 'Save Project' },
+            exportCSV: { key: 's', ctrl: true, alt: false, shift: true, label: 'Export CSV' },
+        };
+
+        const LOCAL_STORAGE_KEY = 'yukkuri_project_data';
+
+        // --- Helper: Key Matcher ---
+        const isKeyMatch = (e, config) => {
+            if (!config) return false;
+            const keyMatch = e.key.toLowerCase() === config.key.toLowerCase();
+            const ctrlMatch = config.ctrl ? (e.ctrlKey || e.metaKey) : !(e.ctrlKey || e.metaKey);
+            const altMatch = config.alt ? e.altKey : !e.altKey;
+            const shiftMatch = config.shift ? e.shiftKey : !e.shiftKey;
+            return keyMatch && ctrlMatch && altMatch && shiftMatch;
+        };
+
+        // --- Icon Component ---
+        const Icon = ({ name, size = 16, className }) => {
+            if (!window.lucide || !window.lucide.icons || !window.lucide.icons[name]) {
+                return null;
+            }
+            try {
+                const iconDef = window.lucide.icons[name];
+                const tempSvg = window.lucide.createElement(iconDef);
+                const innerContent = tempSvg.innerHTML;
+                
+                return (
+                    <svg
+                        width={size}
+                        height={size}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className={className}
+                        dangerouslySetInnerHTML={{ __html: innerContent }}
+                    />
+                );
+            } catch (e) {
+                console.error("Icon render error:", e);
+                return null;
+            }
+        };
+
+        // --- Components ---
+
+        const ToastNotification = ({ notification, onClose }) => {
+            if (!notification) return null;
+
+            const bgColor = notification.type === 'error' 
+                ? 'bg-red-50 border-red-200 text-red-700 dark:bg-red-900/30 dark:border-red-800 dark:text-red-300' 
+                : 'bg-white border-gray-200 text-gray-800 dark:bg-system-gray5 dark:border-gray-700 dark:text-gray-200';
+            
+            const iconName = notification.type === 'error' ? 'AlertCircle' : 'CheckCircle';
+            const iconColor = notification.type === 'error' ? 'text-red-500' : 'text-green-500';
+
+            return (
+                <div className={`fixed top-20 right-6 z-toast flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border animate-slide-in-right max-w-sm ${bgColor}`}>
+                    <div className={iconColor}><Icon name={iconName} size={20} /></div>
+                    <div className="text-sm font-medium">{notification.message}</div>
+                    <button onClick={onClose} className="ml-auto opacity-50 hover:opacity-100 transition-opacity">
+                        <Icon name="X" size={16} />
+                    </button>
+                </div>
+            );
+        };
+
+        const KeyBindingEditor = ({ label, binding, onChange }) => {
+            const [isRecording, setIsRecording] = useState(false);
+
+            const handleKeyDown = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (['Control', 'Shift', 'Alt', 'Meta'].includes(e.key)) return;
+                const newBinding = { ...binding, key: e.key, ctrl: e.ctrlKey || e.metaKey, alt: e.altKey, shift: e.shiftKey };
+                onChange(newBinding);
+                setIsRecording(false);
+            };
+
+            const formatBinding = (b) => {
+                const parts = [];
+                if (b.ctrl) parts.push('Ctrl');
+                if (b.alt) parts.push('Alt');
+                if (b.shift) parts.push('Shift');
+                parts.push(b.key.toUpperCase());
+                return parts.join(' + ');
+            };
+
+            return (
+                <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800 last:border-0">
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
+                    <button
+                        onClick={() => setIsRecording(true)}
+                        onKeyDown={isRecording ? handleKeyDown : undefined}
+                        className={`px-3 py-1.5 rounded-md text-xs font-mono border transition-all ${
+                            isRecording 
+                            ? 'bg-blue-500 text-white border-blue-500 ring-2 ring-blue-200' 
+                            : 'bg-gray-100 dark:bg-system-gray4 text-gray-600 dark:text-gray-400 border-transparent hover:border-gray-300 dark:hover:border-gray-500'
+                        }`}
+                    >
+                        {isRecording ? 'Keys...' : formatBinding(binding)}
+                    </button>
+                </div>
+            );
+        };
+
+        const SettingsModal = ({ isOpen, onClose, keyMap, setKeyMap, lang, setLang, t, characters, setCharacters, initialTab = 'general' }) => {
+            const [activeTab, setActiveTab] = useState(initialTab); 
+
+            useEffect(() => {
+                if (isOpen) setActiveTab(initialTab);
+            }, [isOpen, initialTab]);
+
+            if (!isOpen) return null;
+
+            const handleAddCharacter = () => {
+                if (characters.length >= 9) return;
+                const newId = `c${Date.now()}`;
+                const newChar = {
+                    id: newId,
+                    name: `Character ${characters.length + 1}`,
+                    short: String(characters.length + 1),
+                    color: '#8E8E93'
+                };
+                setCharacters([...characters, newChar]);
+            };
+
+            const handleUpdateCharacter = (id, field, value) => {
+                const updated = characters.map(c => c.id === id ? { ...c, [field]: value } : c);
+                setCharacters(updated);
+            };
+
+            const handleDeleteCharacter = (id) => {
+                if (characters.length <= 1) return;
+                const updated = characters.filter(c => c.id !== id);
+                setCharacters(updated);
+            };
+
+            const resetToDefault = () => {
+                if(confirm(t.confirmReset)) {
+                    setKeyMap(DEFAULT_KEY_MAP);
+                }
+            };
+
+            return (
+                <div className="fixed inset-0 flex items-center justify-center modal-overlay animate-fade-in">
+                    <div className="bg-white dark:bg-system-gray5 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden m-4 flex flex-col max-h-[90vh]">
+                        {/* Header */}
+                        <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-system-gray5">
+                            <h2 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                                <Icon name="Settings" size={18} />
+                                {t.settingsTitle}
+                            </h2>
+                            <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                                <Icon name="X" size={18} />
+                            </button>
+                        </div>
+
+                        {/* Tabs */}
+                        <div className="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-system-gray5">
+                            <button 
+                                onClick={() => setActiveTab('general')}
+                                className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'general' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            >
+                                {t.tabGeneral}
+                            </button>
+                            <button 
+                                onClick={() => setActiveTab('characters')}
+                                className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'characters' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            >
+                                {t.tabCharacters}
+                            </button>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6 overflow-y-auto flex-1">
+                            {activeTab === 'general' && (
+                                <>
+                                    <div className="mb-6">
+                                        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t.language}</h3>
+                                        <div className="flex space-x-2">
+                                            <button onClick={() => setLang('ja')} className={`px-3 py-1.5 rounded-md text-sm transition-colors ${lang === 'ja' ? 'bg-blue-apple text-white' : 'bg-gray-100 dark:bg-system-gray4 text-gray-700 dark:text-gray-300'}`}>日本語</button>
+                                            <button onClick={() => setLang('en')} className={`px-3 py-1.5 rounded-md text-sm transition-colors ${lang === 'en' ? 'bg-blue-apple text-white' : 'bg-gray-100 dark:bg-system-gray4 text-gray-700 dark:text-gray-300'}`}>English</button>
+                                        </div>
+                                    </div>
+                                    <div className="mb-4">
+                                        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t.editorShortcuts}</h3>
+                                        <div className="space-y-1">
+                                            {Object.entries(keyMap).map(([key, binding]) => (
+                                                <KeyBindingEditor key={key} label={binding.label} binding={binding} onChange={(newBinding) => setKeyMap(prev => ({ ...prev, [key]: newBinding }))} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl text-xs text-blue-600 dark:text-blue-300 leading-relaxed">
+                                        <p className="font-semibold mb-1">{t.tipsTitle}</p>
+                                        <ul className="list-disc pl-4 space-y-1">{t.tipsList.map((tip, idx) => <li key={idx}>{tip}</li>)}</ul>
+                                    </div>
+                                    <div className="mt-6 text-right">
+                                        <button onClick={resetToDefault} className="text-xs text-red-500 hover:text-red-600 font-medium">{t.resetDefaults}</button>
+                                    </div>
+                                </>
+                            )}
+
+                            {activeTab === 'characters' && (
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        {characters.map((char, index) => (
+                                            <div key={char.id} className="flex items-center space-x-3 p-2 bg-gray-50 dark:bg-system-gray4/50 rounded-lg animate-fade-in">
+                                                <div className="flex-shrink-0 flex items-center justify-center w-8 text-xs text-gray-400 font-mono">
+                                                    {index + 1}
+                                                </div>
+                                                <div className="flex-shrink-0 relative w-8 h-8 rounded-full overflow-hidden ring-1 ring-gray-200 dark:ring-gray-600">
+                                                    <input 
+                                                        type="color" 
+                                                        value={char.color} 
+                                                        onChange={(e) => handleUpdateCharacter(char.id, 'color', e.target.value)}
+                                                        className="absolute inset-0 w-full h-full scale-150 cursor-pointer p-0 border-0"
+                                                    />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <input 
+                                                        type="text" 
+                                                        value={char.name}
+                                                        onChange={(e) => handleUpdateCharacter(char.id, 'name', e.target.value)}
+                                                        className="w-full bg-transparent border-b border-transparent focus:border-blue-500 focus:outline-none text-sm text-gray-800 dark:text-gray-100 px-1 py-0.5"
+                                                        placeholder="Name"
+                                                    />
+                                                </div>
+                                                <button 
+                                                    onClick={() => handleDeleteCharacter(char.id)}
+                                                    disabled={characters.length <= 1}
+                                                    className={`p-1.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ${characters.length <= 1 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                                >
+                                                    <Icon name="Trash2" size={16} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    
+                                    {characters.length < 9 ? (
+                                        <button 
+                                            onClick={handleAddCharacter}
+                                            className="w-full py-2.5 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 hover:text-blue-500 hover:border-blue-400 dark:hover:text-blue-400 text-sm transition-all flex items-center justify-center space-x-2 bg-gray-50/50 dark:bg-transparent"
+                                        >
+                                            <Icon name="Plus" size={16} />
+                                            <span>{t.addChar}</span>
+                                        </button>
+                                    ) : (
+                                        <div className="text-center text-xs text-gray-400 italic py-2">
+                                            {t.maxCharLimit}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer */}
+                        <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-system-gray6 text-right">
+                            <button onClick={onClose} className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
+                                {t.done}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- App ---
+
+        const App = () => {
+            // -- Initialization with LocalStorage --
+            const getInitialState = (key, defaultVal) => {
+                try {
+                    const saved = localStorage.getItem(key);
+                    if (saved) return JSON.parse(saved);
+                } catch (e) { console.error("Load error", e); }
+                return defaultVal;
+            };
+
+            const [lines, setLines] = useState(() => getInitialState('yukkuri_lines', INITIAL_LINES));
+            const [characters, setCharacters] = useState(() => getInitialState('yukkuri_chars', DEFAULT_CHARACTERS));
+            const [activeCharId, setActiveCharId] = useState(() => {
+                const saved = getInitialState('yukkuri_active_char', null);
+                if (saved && DEFAULT_CHARACTERS.some(c => c.id === saved)) return saved;
+                return DEFAULT_CHARACTERS[0].id;
+            });
+            const [lang, setLang] = useState(() => getInitialState('yukkuri_lang', 'ja'));
+            const [keyMap, setKeyMap] = useState(() => getInitialState('yukkuri_keymap', DEFAULT_KEY_MAP));
+            const [scenarioTitle, setScenarioTitle] = useState(() => getInitialState('yukkuri_title', '無題のシナリオ'));
+            const [isDarkMode, setIsDarkMode] = useState(() => {
+                const saved = localStorage.getItem('yukkuri_darkmode');
+                if (saved !== null) return JSON.parse(saved);
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            });
+
+            const t = TRANSLATIONS[lang];
+            const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+            const [settingsInitialTab, setSettingsInitialTab] = useState('general');
+            const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+            const [focusTarget, setFocusTarget] = useState({ index: 0, field: 'text' });
+            const [isEditingTitle, setIsEditingTitle] = useState(false);
+            const [notification, setNotification] = useState(null); // { message: '', type: 'success'|'error' }
+
+            const lineRefs = useRef({});
+            const dropdownRef = useRef(null);
+            const debounceTimeoutRef = useRef(null);
+            const fileInputRef = useRef(null);
+            const titleInputRef = useRef(null);
+
+            // -- Persist Changes --
+            useEffect(() => localStorage.setItem('yukkuri_lines', JSON.stringify(lines)), [lines]);
+            useEffect(() => localStorage.setItem('yukkuri_chars', JSON.stringify(characters)), [characters]);
+            useEffect(() => localStorage.setItem('yukkuri_active_char', JSON.stringify(activeCharId)), [activeCharId]);
+            useEffect(() => localStorage.setItem('yukkuri_lang', JSON.stringify(lang)), [lang]);
+            useEffect(() => localStorage.setItem('yukkuri_keymap', JSON.stringify(keyMap)), [keyMap]);
+            useEffect(() => localStorage.setItem('yukkuri_title', JSON.stringify(scenarioTitle)), [scenarioTitle]);
+            useEffect(() => localStorage.setItem('yukkuri_darkmode', JSON.stringify(isDarkMode)), [isDarkMode]);
+
+            // Notification Helper
+            const showNotification = (message, type = 'success') => {
+                setNotification({ message, type });
+                setTimeout(() => setNotification(null), 4000);
+            };
+
+            // Initial Load Notification
+            useEffect(() => {
+                if (scenarioTitle) {
+                    showNotification(`${t.loadedProject}${scenarioTitle}`);
+                }
+            }, []); // Run once on mount
+
+            // History logic 
+            const [history, setHistory] = useState([lines]);
+            const [historyIndex, setHistoryIndex] = useState(0);
+
+            const updateLinesWithHistory = (newLines) => {
+                setLines(newLines);
+                const nextHistory = [...history.slice(0, historyIndex + 1), newLines];
+                if (nextHistory.length > 50) nextHistory.shift();
+                setHistory(nextHistory);
+                setHistoryIndex(nextHistory.length - 1);
+            };
+
+            const undo = () => {
+                if (historyIndex > 0) {
+                    setHistoryIndex(historyIndex - 1);
+                    setLines(history[historyIndex - 1]);
+                }
+            };
+
+            const redo = () => {
+                if (historyIndex < history.length - 1) {
+                    setHistoryIndex(historyIndex + 1);
+                    setLines(history[historyIndex + 1]);
+                }
+            };
+            
+            const canUndo = historyIndex > 0;
+            const canRedo = historyIndex < history.length - 1;
+
+            // -- Effects --
+            
+            // Fix for textarea height on load/update
+            useLayoutEffect(() => {
+                Object.values(lineRefs.current).forEach(el => {
+                    if (el && el.tagName === 'TEXTAREA') {
+                        el.style.height = 'auto'; // Reset to shrink
+                        el.style.height = el.scrollHeight + 'px'; // Grow to fit
+                    }
+                });
+            }, [lines]);
+
+            useEffect(() => {
+                const { index, field } = focusTarget;
+                const refKey = `${index}-${field}`;
+                if (lineRefs.current[refKey]) lineRefs.current[refKey].focus();
+            }, [focusTarget, lines.length]);
+
+            useEffect(() => {
+                if (isDarkMode) document.documentElement.classList.add('dark');
+                else document.documentElement.classList.remove('dark');
+            }, [isDarkMode]);
+
+            useEffect(() => {
+                const handleClickOutside = (event) => {
+                    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                        setOpenDropdownIndex(null);
+                    }
+                };
+                document.addEventListener("mousedown", handleClickOutside);
+                return () => document.removeEventListener("mousedown", handleClickOutside);
+            }, []);
+
+            useEffect(() => {
+                if (isEditingTitle && titleInputRef.current) {
+                    titleInputRef.current.focus();
+                }
+            }, [isEditingTitle]);
+
+            useEffect(() => {
+                if (!characters.find(c => c.id === activeCharId)) {
+                    if (characters.length > 0) setActiveCharId(characters[0].id);
+                }
+            }, [characters, activeCharId]);
+
+            // -- Actions --
+            const updateLine = (index, field, value) => {
+                const newLines = [...lines];
+                newLines[index] = { ...newLines[index], [field]: value };
+                
+                if (field === 'text') {
+                    setLines(newLines);
+                    if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
+                    debounceTimeoutRef.current = setTimeout(() => {
+                        setHistory(prev => [...prev.slice(0, historyIndex + 1), newLines]);
+                        setHistoryIndex(prev => prev + 1);
+                    }, 500);
+                } else {
+                    updateLinesWithHistory(newLines);
+                }
+            };
+
+            const addNewLine = (afterIndex) => {
+                const newLine = { id: Date.now(), charId: activeCharId, text: '' };
+                const newLines = [...lines];
+                newLines.splice(afterIndex + 1, 0, newLine);
+                updateLinesWithHistory(newLines);
+                setFocusTarget({ index: afterIndex + 1, field: 'text' });
+            };
+
+            const removeLine = (index) => {
+                if (lines.length <= 1) return;
+                const newLines = lines.filter((_, i) => i !== index);
+                updateLinesWithHistory(newLines);
+                setFocusTarget({ index: Math.max(0, index - 1), field: 'text' });
+            };
+
+            const moveFocus = (currentIndex, direction) => {
+                if (direction === 'up' && currentIndex > 0) setFocusTarget({ index: currentIndex - 1, field: 'text' });
+                else if (direction === 'down' && currentIndex < lines.length - 1) setFocusTarget({ index: currentIndex + 1, field: 'text' });
+            };
+
+            const exportCSV = () => {
+                let csvContent = "\uFEFFCharacter,Text\n";
+                lines.forEach(line => {
+                    const char = characters.find(c => c.id === line.charId);
+                    const charName = char ? char.name : 'Unknown';
+                    const safeText = `"${line.text.replace(/"/g, '""')}"`;
+                    csvContent += `${charName},${safeText}\n`;
+                });
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                link.setAttribute("download", `${scenarioTitle || 'scenario'}_${new Date().toISOString().slice(0,10)}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
+            const saveProject = () => {
+                const projectData = {
+                    version: 1,
+                    timestamp: new Date().toISOString(),
+                    title: scenarioTitle,
+                    characters,
+                    activeCharId,
+                    lines
+                };
+                const jsonContent = JSON.stringify(projectData, null, 2);
+                const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                link.setAttribute("download", `${scenarioTitle || 'project'}_${new Date().toISOString().slice(0,10)}.json`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
+            const triggerLoadProject = () => {
+                if (fileInputRef.current) {
+                    fileInputRef.current.click();
+                }
+            };
+
+            const parseCSV = (text) => {
+                const lines = text.split(/\r\n|\n/);
+                const parsedLines = [];
+                let startIndex = 0;
+                if (lines[0].includes('Character') || lines[0].includes('Text')) startIndex = 1;
+
+                for (let i = startIndex; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (!line.trim()) continue;
+                    
+                    let charName = '';
+                    let textVal = '';
+                    
+                    const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                    if (!matches && line.includes(',')) {
+                        const parts = line.split(',');
+                        charName = parts[0];
+                        textVal = parts.slice(1).join(','); 
+                    } else {
+                        const regex = /(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)/g;
+                        let m;
+                        const cols = [];
+                        while ((m = regex.exec(line)) !== null) {
+                            let val = m[1].replace(/^"|"$/g, '').replace(/""/g, '"');
+                            cols.push(val);
+                        }
+                        if (cols.length >= 2) {
+                            charName = cols[0];
+                            textVal = cols[1];
+                        }
+                    }
+
+                    if (charName || textVal) {
+                        let char = characters.find(c => c.name === charName);
+                        const cid = char ? char.id : characters[0].id;
+                        
+                        parsedLines.push({
+                            id: Date.now() + i,
+                            charId: cid,
+                            text: textVal || ''
+                        });
+                    }
+                }
+                return parsedLines;
+            };
+
+            const handleFileUpload = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const content = event.target.result;
+                    if (file.name.endsWith('.json')) {
+                        try {
+                            const projectData = JSON.parse(content);
+                            
+                            // Validation
+                            if (!projectData.lines || !Array.isArray(projectData.lines)) throw new Error("Invalid format");
+                            if (projectData.characters && projectData.characters.length > 9) {
+                                showNotification(t.errorCharLimitExceeded, 'error');
+                                return;
+                            }
+
+                            if (projectData.lines && Array.isArray(projectData.lines) && projectData.characters && Array.isArray(projectData.characters)) {
+                                setCharacters(projectData.characters);
+                                setLines(projectData.lines);
+                                if (projectData.activeCharId) setActiveCharId(projectData.activeCharId);
+                                if (projectData.title) setScenarioTitle(projectData.title);
+                                updateLinesWithHistory(projectData.lines);
+                                showNotification(`${t.loadedProject}${projectData.title || 'Untitled'}`);
+                            } else {
+                                showNotification(t.errorInvalidFormat, 'error');
+                            }
+                        } catch (err) { showNotification(t.importError, 'error'); }
+                    } else if (file.name.endsWith('.csv')) {
+                        try {
+                            const newLines = parseCSV(content);
+                            if (newLines.length > 0) {
+                                setLines(newLines);
+                                updateLinesWithHistory(newLines);
+                                const title = file.name.replace('.csv', '');
+                                setScenarioTitle(title);
+                                showNotification(`${t.csvImportSuccess}: ${title}`);
+                            } else {
+                                showNotification(t.importError, 'error');
+                            }
+                        } catch (err) { showNotification(t.importError, 'error'); }
+                    } else {
+                        showNotification(t.errorInvalidFormat, 'error');
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = ''; 
+            };
+
+            const handleGlobalKeyDown = (e) => {
+                if (isKeyMatch(e, keyMap.saveProject)) { e.preventDefault(); saveProject(); }
+                if (isKeyMatch(e, keyMap.exportCSV)) { e.preventDefault(); exportCSV(); }
+                if (isKeyMatch(e, keyMap.undo)) { e.preventDefault(); if(canUndo) undo(); }
+                if (isKeyMatch(e, keyMap.redo)) { e.preventDefault(); if(canRedo) redo(); }
+                
+                if ((e.ctrlKey || e.metaKey) && e.altKey && !isNaN(e.key)) {
+                    e.preventDefault();
+                    const charIndex = parseInt(e.key) - 1;
+                    if (characters[charIndex]) setActiveCharId(characters[charIndex].id);
+                    return;
+                }
+                
+                const isInputActive = ['TEXTAREA', 'INPUT'].includes(document.activeElement?.tagName) && !document.activeElement.classList.contains('hidden-input');
+                
+                if (!isInputActive && (e.ctrlKey || e.metaKey) && e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+                    e.preventDefault();
+                    const currentCharIndex = characters.findIndex(c => c.id === activeCharId);
+                    if (currentCharIndex === -1) return;
+                    let nextIndex = e.key === 'ArrowDown' ? (currentCharIndex + 1) % characters.length : (currentCharIndex - 1 + characters.length) % characters.length;
+                    setActiveCharId(characters[nextIndex].id);
+                }
+            };
+
+            useEffect(() => {
+                window.addEventListener('keydown', handleGlobalKeyDown);
+                return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+            }, [lines, historyIndex, keyMap, activeCharId, characters, scenarioTitle]); 
+
+            const handleLineKeyDown = (e, index) => {
+                if (e.nativeEvent.isComposing) return;
+                if (isKeyMatch(e, keyMap.newLine)) { e.preventDefault(); addNewLine(index); return; }
+                if (isKeyMatch(e, keyMap.deleteLine)) { e.preventDefault(); removeLine(index); return; }
+                if (isKeyMatch(e, keyMap.moveFocusUp)) { e.preventDefault(); moveFocus(index, 'up'); return; }
+                if (isKeyMatch(e, keyMap.moveFocusDown)) { e.preventDefault(); moveFocus(index, 'down'); return; }
+
+                if ((e.ctrlKey || e.metaKey) && e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+                    e.preventDefault();
+                    const currentLineCharId = lines[index].charId;
+                    const charIndex = characters.findIndex(c => c.id === currentLineCharId);
+                    if (charIndex === -1) return;
+                    let nextIndex = e.key === 'ArrowDown' ? (charIndex + 1) % characters.length : (charIndex - 1 + characters.length) % characters.length;
+                    updateLine(index, 'charId', characters[nextIndex].id);
+                    return;
+                }
+                if (e.key === 'Tab') { e.preventDefault(); return; }
+            };
+
+            const openSettingsToChars = () => {
+                setSettingsInitialTab('characters');
+                setIsSettingsOpen(true);
+            };
+
+            return (
+                <div className={`flex h-screen overflow-hidden text-sm transition-colors duration-300 ${isDarkMode ? 'dark bg-black' : 'bg-[#F5F5F7]'}`}>
+                    <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".json,.csv" className="hidden" />
+                    
+                    <ToastNotification notification={notification} onClose={() => setNotification(null)} />
+
+                    <SettingsModal 
+                        isOpen={isSettingsOpen} 
+                        onClose={() => setIsSettingsOpen(false)} 
+                        keyMap={keyMap} setKeyMap={setKeyMap}
+                        lang={lang} setLang={setLang} t={t}
+                        characters={characters} setCharacters={setCharacters}
+                        initialTab={settingsInitialTab}
+                    />
+
+                    {/* Sidebar */}
+                    <aside className="w-64 bg-white dark:bg-system-gray5 border-r border-gray-200 dark:border-gray-700 flex flex-col z-20 shadow-lg transition-colors duration-300">
+                        <div className="p-6 pb-4">
+                            <div className="flex items-center space-x-2 text-gray-800 dark:text-gray-100 font-semibold mb-6">
+                                <img src="./Logo.png" alt="App Logo" className="w-6 h-6 rounded-lg shrink-0" />
+                                <span className="truncate">{t.appTitle}</span>
+                            </div>
+
+                            <div className="flex justify-between items-center mb-3">
+                                <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{t.activeCharacter}</h3>
+                                <button onClick={openSettingsToChars} className="text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
+                                    <Icon name="Settings" size={12} />
+                                </button>
+                            </div>
+                            <div className="space-y-1">
+                                {characters.map((char, idx) => {
+                                    const isActive = activeCharId === char.id;
+                                    return (
+                                        <div key={char.id} onClick={() => setActiveCharId(char.id)} className={`group flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer ${isActive ? 'bg-blue-50 dark:bg-blue-900/20 ring-1 ring-blue-200 dark:ring-blue-800' : 'hover:bg-gray-50 dark:hover:bg-system-gray4'}`}>
+                                            <div className="flex items-center space-x-3 overflow-hidden">
+                                                <span className="w-2 h-2 rounded-full ring-1 ring-white/10 shrink-0" style={{ backgroundColor: char.color }}></span>
+                                                <span className={`font-medium truncate ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200'}`}>{char.name}</span>
+                                            </div>
+                                            <span className={`text-[10px] px-1.5 py-0.5 rounded border font-mono shrink-0 ${isActive ? 'text-blue-500 bg-blue-100/50 border-blue-200 dark:text-blue-300 dark:bg-blue-900/40 dark:border-blue-800' : 'text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-system-gray4 border-gray-200 dark:border-gray-600 group-hover:bg-white dark:group-hover:bg-system-gray3'}`}>
+                                                {idx+1}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                                <button onClick={openSettingsToChars} className="w-full mt-2 py-2 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-400 hover:text-blue-500 hover:border-blue-400 text-xs transition-all flex items-center justify-center space-x-1">
+                                    <Icon name="Plus" size={12} />
+                                    <span>{t.addChar}</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div className="mt-auto p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-system-gray6">
+                            <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">{t.shortcuts}</h3>
+                            <div className="space-y-2 text-xs text-gray-500 dark:text-gray-400">
+                                <div className="flex justify-between"><span>{t.newLine}</span> <kbd className="font-mono bg-white dark:bg-system-gray4 px-1 border dark:border-gray-600 rounded shadow-sm">Ctrl+Enter</kbd></div>
+                                <div className="flex justify-between"><span>{t.switchActive}</span> <kbd className="font-mono bg-white dark:bg-system-gray4 px-1 border dark:border-gray-600 rounded shadow-sm">Ctrl+Alt+↑↓</kbd></div>
+                                <div className="flex justify-between"><span>{t.deleteLine}</span> <kbd className="font-mono bg-white dark:bg-system-gray4 px-1 border dark:border-gray-600 rounded shadow-sm">Ctrl+Bksp</kbd></div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    {/* Main Content */}
+                    <main className="flex-1 flex flex-col h-full relative bg-[#F5F5F7] dark:bg-black transition-colors duration-300">
+                        <header className="h-16 glass flex items-center justify-between px-8 absolute w-full z-10 top-0 transition-colors duration-300">
+                            <div className="flex items-center space-x-4">
+                                <div className="flex items-center group">
+                                    {isEditingTitle ? (
+                                        <input
+                                            ref={titleInputRef}
+                                            type="text"
+                                            value={scenarioTitle}
+                                            onChange={(e) => setScenarioTitle(e.target.value)}
+                                            onBlur={() => setIsEditingTitle(false)}
+                                            onKeyDown={(e) => e.key === 'Enter' && setIsEditingTitle(false)}
+                                            className="font-semibold text-gray-800 dark:text-gray-100 bg-transparent border-b-2 border-blue-500 focus:outline-none"
+                                        />
+                                    ) : (
+                                        <h1 
+                                            onClick={() => setIsEditingTitle(true)}
+                                            className="font-semibold text-gray-800 dark:text-gray-100 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2"
+                                        >
+                                            {scenarioTitle}
+                                            <Icon name="Pencil" size={14} className="opacity-0 group-hover:opacity-50" />
+                                        </h1>
+                                    )}
+                                </div>
+                                <span className="text-xs text-gray-400 dark:text-gray-500 px-2 py-1 bg-gray-200/50 dark:bg-gray-700/50 rounded-md">{lines.length} {t.linesSuffix}</span>
+                                <div className="flex space-x-1 ml-4">
+                                    <button onClick={undo} disabled={!canUndo} className={`p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 transition-colors ${!canUndo ? 'opacity-30 cursor-not-allowed' : 'opacity-70'}`}><Icon name="Undo" size={16} /></button>
+                                    <button onClick={redo} disabled={!canRedo} className={`p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/10 transition-colors ${!canRedo ? 'opacity-30 cursor-not-allowed' : 'opacity-70'}`}><Icon name="Redo" size={16} /></button>
+                                </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <button onClick={() => { setSettingsInitialTab('general'); setIsSettingsOpen(true); }} className="p-2 rounded-lg text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors" title={t.settings}><Icon name="Settings" size={18} /></button>
+                                <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-lg text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors" title={t.toggleDarkMode}>{isDarkMode ? <Icon name="Sun" size={18} /> : <Icon name="Moon" size={18} />}</button>
+                                <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
+                                <button onClick={triggerLoadProject} className="p-2 rounded-lg text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors" title={t.openProject}><Icon name="FolderOpen" size={18} /></button>
+                                <button onClick={saveProject} className="p-2 rounded-lg text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors" title={t.saveProject}><Icon name="Save" size={18} /></button>
+                                <button onClick={exportCSV} className="flex items-center space-x-2 bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg text-xs font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-all shadow-md active:scale-95 ml-2" title={t.exportCSV}><Icon name="Download" size={14} /><span className="hidden sm:inline">{t.exportCSV}</span></button>
+                            </div>
+                        </header>
+
+                        <div className="flex-1 overflow-y-auto pt-24 pb-32 px-8 sm:px-12 lg:px-24 scroll-smooth">
+                            <div className="max-w-4xl mx-auto space-y-3">
+                                {lines.map((line, index) => {
+                                    const currentChar = characters.find(c => c.id === line.charId) || characters[0] || { name: '?', color: '#ccc' };
+                                    const isDropdownOpen = openDropdownIndex === index;
+                                    
+                                    return (
+                                        <div 
+                                            key={line.id} 
+                                            className="group flex items-start space-x-4 animate-fade-in"
+                                            style={{ zIndex: isDropdownOpen ? 50 : 'auto', position: 'relative' }}
+                                        >
+                                            <div className="flex-shrink-0 pt-1 relative">
+                                                <div 
+                                                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm transition-all cursor-pointer hover:shadow-md ring-1 ring-black/5 dark:ring-white/10 active:scale-95"
+                                                    style={{ backgroundColor: currentChar.color }}
+                                                    onClick={(e) => { e.stopPropagation(); setOpenDropdownIndex(isDropdownOpen ? null : index); }}
+                                                >
+                                                    {currentChar.name[0]}
+                                                </div>
+                                                {isDropdownOpen && (
+                                                    <div ref={dropdownRef} className="absolute top-12 left-0 w-48 glass-panel rounded-xl overflow-hidden animate-scale-in flex flex-col shadow-2xl z-60">
+                                                        <div className="px-3 py-2 text-xs font-semibold text-gray-400 dark:text-gray-500 bg-gray-50/50 dark:bg-system-gray6/50 border-b border-gray-100 dark:border-gray-700">{t.selectCharacter}</div>
+                                                        <div className="py-1 max-h-48 overflow-y-auto">
+                                                            {characters.map((char) => (
+                                                                <button key={char.id} onClick={() => { updateLine(index, 'charId', char.id); setOpenDropdownIndex(null); }} className={`w-full text-left px-4 py-2 text-sm flex items-center gap-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors ${char.id === line.charId ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}>
+                                                                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: char.color }}></span>
+                                                                    <span className="text-gray-700 dark:text-gray-200 truncate">{char.name}</span>
+                                                                    {char.id === line.charId && <Icon name="Check" size={14} className="ml-auto text-blue-500" />}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <div className="absolute -bottom-5 left-0 w-full text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                                    <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap">{currentChar.name}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 relative z-0">
+                                                <textarea
+                                                    ref={el => lineRefs.current[`${index}-text`] = el}
+                                                    value={line.text}
+                                                    onChange={(e) => updateLine(index, 'text', e.target.value)}
+                                                    onKeyDown={(e) => handleLineKeyDown(e, index)}
+                                                    placeholder={t.placeholder}
+                                                    rows={1}
+                                                    className="input-apple w-full bg-white dark:bg-system-gray5 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-base text-gray-800 dark:text-gray-100 placeholder-gray-300 dark:placeholder-gray-600 shadow-sm focus:bg-white dark:focus:bg-system-gray5 resize-none overflow-hidden transition-all"
+                                                    style={{ minHeight: '48px', height: 'auto' }}
+                                                    onInput={(e) => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
+                                                />
+                                                <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button onClick={() => removeLine(index)} className="p-1 hover:bg-red-50 text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-400 rounded-md transition-colors" tabIndex={-1} title={`${t.deleteLine} (Ctrl+Backspace)`}><Icon name="X" size={14} /></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                <div className="py-8 flex justify-center opacity-50 hover:opacity-100 transition-opacity cursor-pointer" onClick={() => addNewLine(lines.length - 1)}>
+                                    <div className="flex items-center space-x-2 text-gray-400 dark:text-gray-500"><Icon name="PlusCircle" size={20} /><span>Click or Press Ctrl+Enter</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
